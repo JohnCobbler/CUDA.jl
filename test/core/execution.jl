@@ -1247,3 +1247,37 @@ end
 end
 
 ############################################################################################
+
+@testset "launch seed is independent of host RNG seed" begin
+
+    dummy_kernel() = return
+    k = @cuda launch=false dummy_kernel()
+
+    Random.seed!(0xdeadbeef)
+    s1 = CUDACore.make_seed(k)
+    Random.seed!(0xdeadbeef)
+    s2 = CUDACore.make_seed(k)
+    @test s1 != s2
+
+end
+
+############################################################################################
+
+@testset "launch RNG is per-task" begin
+
+    dummy_kernel() = return
+    k = @cuda launch=false dummy_kernel()
+
+    seeds = Channel{UInt32}(8)
+    @sync for _ in 1:8
+        Threads.@spawn put!(seeds, CUDACore.make_seed(k))
+    end
+    close(seeds)
+    collected = collect(seeds)
+
+    @test length(collected) == 8
+    @test allunique(collected)
+
+end
+
+############################################################################################
