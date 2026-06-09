@@ -160,7 +160,7 @@ end
 
 @testset "local memory stores due to byval" begin
     # JuliaGPU/GPUCompiler.jl#92
-    @test @filecheck CUDA.code_ptx(NTuple{2,CuDeviceArray{Float32,1,AS.Global}}) do y1, y2
+    @test @filecheck CUDA.code_ptx(NTuple{2,CuDeviceArray{Float32,1,AS.Global,Int32}}) do y1, y2
         @check_not ".local"
         y = threadIdx().x == 1 ? y1 : y2
         @inbounds y[] = 0

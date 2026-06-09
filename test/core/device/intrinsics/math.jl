@@ -341,7 +341,7 @@ using SpecialFunctions
 
     @testset "@fastmath sincos" begin
         # JuliaGPU/CUDA.jl#1606: FastMath.sincos fell back to regular sin/cos
-        @test @filecheck CUDA.code_ptx(NTuple{3,CuDeviceArray{Float32,1,AS.Global}}) do a, b, c
+        @test @filecheck CUDA.code_ptx(NTuple{3,CuDeviceArray{Float32,1,AS.Global,Int32}}) do a, b, c
             @check "sin.approx.f32"
             @check "cos.approx.f32"
             @check_not "__nv"  # from libdevice
